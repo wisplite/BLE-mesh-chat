@@ -39,6 +39,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final TextEditingController _messageController = TextEditingController();
+  final FocusNode _messageFocusNode = FocusNode();
   late IO.Socket _socket;
   late List<Map<String, dynamic>> _messages;
   late List<Map<String, dynamic>> _connectedUsers;
@@ -94,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _socket.dispose();
     } catch (_) {}
     _messageController.dispose();
+    _messageFocusNode.dispose();
     super.dispose();
   }
 
@@ -104,6 +106,8 @@ class _MyHomePageState extends State<MyHomePage> {
       _appendMessage(text, 'Me', true);
     });
     _messageController.clear();
+    _messageFocusNode.requestFocus();
+    _messageController.selection = const TextSelection.collapsed(offset: 0);
     _socket.emit('send_message', jsonEncode({'message': text}));
   }
 
@@ -157,6 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Expanded(
                           child: TextField(
                             controller: _messageController,
+                            focusNode: _messageFocusNode,
                             decoration: InputDecoration(hintText: 'Message', hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
                             onSubmitted: (value) {
                               _sendMessage();
