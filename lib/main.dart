@@ -76,6 +76,16 @@ class _MyHomePageState extends State<MyHomePage> {
         _appendMessage(messageMap['message'] ?? '', messageMap['sender'] ?? '', messageMap['isMe'] ?? false);
       }
     });
+    _socket.on('connected_devices', (data) {
+      final dynamic raw = (data is List && data.isNotEmpty) ? data[0] : data;
+      final dynamic decoded = raw is String ? jsonDecode(raw) : raw;
+
+      final List<Map<String, dynamic>> users = (decoded as List)
+          .map((e) => Map<String, dynamic>.from(e as Map))
+          .toList();
+
+      setUsers(users);
+    });
   }
 
   @override
@@ -103,26 +113,9 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  void addOrUpdateUser(String user, String rssi) {
+  void setUsers(List<Map<String, dynamic>> users) {
     setState(() {
-      final int existingIndex = _connectedUsers.indexWhere((u) => u['user'] == user);
-      if (existingIndex >= 0) {
-        _connectedUsers[existingIndex] = {'user': user, 'rssi': rssi};
-      } else {
-        _connectedUsers.add({'user': user, 'rssi': rssi});
-      }
-    });
-  }
-
-  void removeUser(String user) {
-    setState(() {
-      _connectedUsers.removeWhere((u) => u['user'] == user);
-    });
-  }
-
-  void receiveMessage(String message, String sender) {
-    setState(() {
-      _messages.add({'message': message, 'sender': sender, 'isMe': false});
+      _connectedUsers = users;
     });
   }
 
