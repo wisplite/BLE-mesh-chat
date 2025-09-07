@@ -25,6 +25,12 @@ class Message extends StatelessWidget {
         ),
       );
     } else {
+      if (sender == 'server') {
+        return Container(
+          alignment: Alignment.center,
+          child: Text(message, style: TextStyle(color: Colors.white)),
+        );
+      }
       return Container(        
         alignment: Alignment.centerLeft,
         child: Container(
